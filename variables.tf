@@ -3,3 +3,7 @@ variable "name" {
   type        = "string"
   default     = "packer-cleanup"
 }
+
+variable "lambda_layers" {
+  default = []
+}
