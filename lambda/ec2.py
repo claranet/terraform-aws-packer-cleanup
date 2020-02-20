@@ -57,7 +57,7 @@ def describe_instances(**kwargs):
             for instance in reservation['Instances']:
                 yield instance
 
-def get_instances_with_key_names(key_names):
+def describe_instances_with_key_names(key_names):
     """
     Describes one or more of your instances whose 'key-name' value matches any item in key_names.
 
