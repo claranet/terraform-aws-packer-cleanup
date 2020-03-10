@@ -1,5 +1,6 @@
 module "lambda" {
-  source = "github.com/claranet/terraform-aws-lambda?ref=v0.12.0"
+  source  = "claranet/lambda/aws"
+  version = "1.1.0"
 
   function_name = "${var.name}"
   description   = "Cleans up Packer resources"
@@ -10,8 +11,9 @@ module "lambda" {
 
   source_path = "${path.module}/lambda"
 
-  attach_policy = true
-  policy        = "${data.aws_iam_policy_document.lambda.json}"
+  policy = {
+    json = "${data.aws_iam_policy_document.lambda.json}"
+  }
 }
 
 data "aws_iam_policy_document" "lambda" {
