@@ -4,7 +4,10 @@ import calendar
 import datetime
 import ec2
 import time
+import functools
+import operator
 
+MAX_FILTERS = 199
 
 def cleanup():
     """
@@ -82,16 +85,17 @@ def get_old_packer_keys():
         if key_name.startswith('packer_'):
             packer_keys.add(key_name)
 
-    # Exclude keys used by EC2 instances.
-    instances = ec2.describe_instances(
-        Filters=[
-            {
-                'Name': 'key-name',
-                'Values': list(packer_keys),
-            }
-        ]
+    # Obtain list (of maximum length MAX_FILTERS) of instances dependent on any item in packer_keys.
+    instances_using_packer_keys = functools.reduce(
+        operator.add,
+        map(
+            ec2.get_instances_with_key_names,
+            [list(packer_keys)[i:i+MAX_FILTERS] for i in range(0,len(packer_keys),MAX_FILTERS)]
+        )
     )
-    for instance in instances:
+
+    # Exclude keys used by EC2 instances.
+    for instance in instances_using_packer_keys:
         key_name = instance['KeyName']
         packer_keys.discard(key_name)
 
